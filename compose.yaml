@@ -1,0 +1,81 @@
+# Backend application deployment for the eform platform.
+#
+# This directory is intended to become the root of the backend repository.
+
+services:
+  api:
+    image: ghcr.io/${GHCR_OWNER}/eform-api:${IMAGE_TAG}
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - eform-api-uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - edge
+      - eform-api-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.eform-api.rule=Host(`eform-api.${PLATFORM_DOMAIN}`)"
+      - "traefik.http.routers.eform-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.eform-api.middlewares=secure-headers@file"
+      - "traefik.http.services.eform-api.loadbalancer.server.port=8080"
+
+  db:
+    image: postgres:16.2
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - eform-api-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - eform-api-internal
+
+volumes:
+  eform-api-db-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/apps/eform-api/volumes/db-data
+  eform-api-uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /srv/apps/eform-api/volumes/uploads
+
+networks:
+  edge:
+    external: true
+  eform-api-internal:
+    driver: bridge
