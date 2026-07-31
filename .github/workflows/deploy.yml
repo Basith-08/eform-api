@@ -42,10 +42,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Normalize image owner
+        id: image
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: echo "owner=$(printf '%s' "$OWNER" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
       - name: Build and push image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/eform-api:${{ steps.sha.outputs.sha }} .
-          docker push ghcr.io/${{ github.repository_owner }}/eform-api:${{ steps.sha.outputs.sha }}
+          docker build -t ghcr.io/${{ steps.image.outputs.owner }}/eform-api:${{ steps.sha.outputs.sha }} .
+          docker push ghcr.io/${{ steps.image.outputs.owner }}/eform-api:${{ steps.sha.outputs.sha }}
 
       - name: Deploy to production
         uses: appleboy/ssh-action@v1
