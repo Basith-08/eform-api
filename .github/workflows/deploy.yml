@@ -13,6 +13,10 @@ concurrency:
   group: deploy-eform-api
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
