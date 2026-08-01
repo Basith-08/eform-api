@@ -73,18 +73,18 @@ Salin `.env.example` sebagai titik awal. Variable utama yang digunakan aplikasi:
 |---|---|---|
 | `APP_ENV` | `development` | Environment aplikasi |
 | `APP_NAME` | `E-Form Employee Management System` | Nama service |
-| `PORT` | `8080` | Port HTTP |
-| `FRONTEND_URL` | `http://localhost:5173` | Origin yang diizinkan CORS |
+| `APP_PORT` | `8080` | Port HTTP |
+| `APP_BASE_URL` | `http://localhost:5173` | Origin yang diizinkan CORS |
 | `UPLOAD_PATH` | `./uploads` | Direktori upload dokumen |
 | `MAX_UPLOAD_BYTES` | `1048576` | Batas ukuran upload dalam byte |
 | `RATE_LIMIT_RPS` | `10` | Request per detik |
 | `RATE_LIMIT_BURST` | `20` | Burst rate limit |
 | `SEED_ON_BOOT` | `true` | Jalankan seed saat startup |
-| `DB_HOST` | `localhost` | Host PostgreSQL |
+| `POSTGRES_USER` | `postgres` | User database aplikasi dan PostgreSQL |
+| `POSTGRES_PASSWORD` | `postgres` | Password database aplikasi dan PostgreSQL |
+| `POSTGRES_DB` | `eform` | Nama database aplikasi dan PostgreSQL |
+| `DB_HOST` | `db` | Host PostgreSQL |
 | `DB_PORT` | `5432` | Port PostgreSQL |
-| `DB_NAME` | `eform` | Nama database aplikasi |
-| `DB_USER` | `postgres` | User database aplikasi |
-| `DB_PASSWORD` | `postgres` | Password database aplikasi |
 | `DB_SSLMODE` | `disable` | SSL mode PostgreSQL |
 | `DB_TIMEZONE` | `UTC` | Time zone koneksi database |
 | `JWT_SECRET` | `change-this-secret` | Secret signing JWT; wajib diganti di deployment |
@@ -143,7 +143,7 @@ docker build -t eform-api .
 
 Image menjalankan binary `/app/eform-api`, mengekspos port `8080`, dan membawa direktori `migrations/` serta `seeds/`.
 
-`compose.yaml` ditujukan untuk deployment image dari GHCR, bukan development lokal. Variable deployment yang diperlukan antara lain `GHCR_OWNER`, `IMAGE_TAG`, dan `PLATFORM_DOMAIN`. Service PostgreSQL Compose juga membutuhkan variable `POSTGRES_USER`, `POSTGRES_PASSWORD`, dan `POSTGRES_DB` selain variable `DB_*` yang digunakan aplikasi.
+`compose.yaml` ditujukan untuk deployment image dari GHCR, bukan development lokal. Variable deployment yang diperlukan antara lain `GHCR_OWNER`, `IMAGE_TAG`, dan `PLATFORM_DOMAIN`. Aplikasi membaca `POSTGRES_PASSWORD` dan `POSTGRES_DB` agar kredensialnya sama dengan service PostgreSQL Compose.
 
 Compose memakai external network `edge` serta bind mount production di `/srv/apps/eform-api/volumes/`; pastikan keduanya tersedia sebelum menjalankannya.
 
@@ -155,4 +155,3 @@ Workflow `.github/workflows/deploy.yml` berjalan ketika ada push ke branch `main
 2. Build dan push image ke GHCR dengan tag commit SHA.
 3. Mengubah `IMAGE_TAG` di server production.
 4. Menjalankan `docker compose pull` dan `docker compose up -d` melalui SSH.
-
