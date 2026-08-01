@@ -74,7 +74,7 @@ Salin `.env.example` sebagai titik awal. Variable utama yang digunakan aplikasi:
 | `APP_ENV` | `development` | Environment aplikasi |
 | `APP_NAME` | `E-Form Employee Management System` | Nama service |
 | `APP_PORT` | `8080` | Port HTTP |
-| `APP_BASE_URL` | `http://localhost:5173` | Origin yang diizinkan CORS |
+| `CORS_ALLOWED_ORIGINS` | - | Daftar origin CORS dipisahkan koma |
 | `UPLOAD_PATH` | `./uploads` | Direktori upload dokumen |
 | `MAX_UPLOAD_BYTES` | `1048576` | Batas ukuran upload dalam byte |
 | `RATE_LIMIT_RPS` | `10` | Request per detik |

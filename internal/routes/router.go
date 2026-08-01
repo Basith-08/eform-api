@@ -24,7 +24,7 @@ type Handlers struct {
 func NewRouter(cfg config.Config, jwtManager *auth.Manager, handlers Handlers) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
-	router.Use(middleware.CORSMiddleware(cfg.FrontendURL))
+	router.Use(middleware.CORSMiddleware(cfg.CORSAllowedOrigins))
 	router.Use(middleware.SecureHeaders())
 	router.Use(middleware.RateLimiter(cfg.RateLimitRPS, cfg.RateLimitBurst))
 	router.Static("/uploads", cfg.UploadPath)
